@@ -1,0 +1,205 @@
+/* ===== 기본 설정 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== 다크 모드 색상 ===== */
+:root {
+    --bg-color: #1a1a2e;        /* 배경색: 진한 남색 */
+    --card-color: #16213e;       /* 카드 배경: 약간 밝은 남색 */
+    --text-color: #eaeaea;       /* 글자색: 밝은 회색 */
+    --accent-color: #4ecca3;     /* 강조색: 민트 그린 */
+    --border-color: #333;        /* 테두리색 */
+}
+
+/* ===== 전체 페이지 ===== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* ===== 앱 컨테이너 ===== */
+.app {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ===== 헤더 ===== */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* ===== 진행률 바 ===== */
+.progress-container {
+    background-color: var(--card-color);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 20px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent-color);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* ===== 운동 목록 ===== */
+.exercise-list {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.exercise-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--card-color);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* ===== 체크박스 스타일 ===== */
+.exercise-check {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+}
+
+/* ===== 운동 이름 ===== */
+.exercise-name {
+    flex: 1;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* 체크되면 취소선 */
+.exercise-check:checked + .exercise-name {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* ===== 무게 입력 ===== */
+.weight-input {
+    width: 70px;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    text-align: center;
+    font-size: 1rem;
+}
+
+.weight-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+/* ===== 저장 버튼 ===== */
+.save-button {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--accent-color);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.save-button:hover {
+    opacity: 0.9;
+}
+
+.save-button:active {
+    transform: scale(0.98);
+}
+
+/* ===== 모바일 최적화 ===== */
+
+/* 터치하기 쉽게 요소 크기 조정 */
+@media (max-width: 480px) {
+    body {
+        padding: 15px;
+    }
+
+    .header h1 {
+        font-size: 1.3rem;
+    }
+
+    .exercise-item {
+        padding: 12px;
+    }
+
+    .exercise-check {
+        width: 28px;
+        height: 28px;
+    }
+
+    .weight-input {
+        width: 65px;
+        padding: 10px 5px;
+    }
+
+    .save-button {
+        padding: 18px;
+        font-size: 1.2rem;
+        /* 모바일에서 하단 고정 */
+        position: fixed;
+        bottom: 20px;
+        left: 15px;
+        right: 15px;
+        width: auto;
+    }
+
+    /* 버튼 공간 확보 */
+    .exercise-list {
+        margin-bottom: 80px;
+    }
+}
+
+/* iOS Safari 입력창 줌 방지 */
+input[type="number"] {
+    font-size: 16px;
+}
+
+/* 스크롤 부드럽게 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 텍스트 선택 방지 (앱처럼 느껴지게) */
+.exercise-name,
+.save-button {
+    -webkit-user-select: none;
+    user-select: none;
+}

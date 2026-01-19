@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>운동 기록</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 앱 컨테이너 -->
+    <div class="app">
+        <!-- 헤더: 제목 표시 -->
+        <header class="header">
+            <h1>💪 오늘의 운동: 가슴</h1>
+        </header>
+
+        <!-- 진행률 바 -->
+        <div class="progress-container">
+            <div class="progress-text">진행률: <span id="progress-percent">0%</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- 운동 목록 -->
+        <ul class="exercise-list">
+            <li class="exercise-item">
+                <input type="checkbox" id="ex1" class="exercise-check">
+                <label for="ex1" class="exercise-name">벤치프레스</label>
+                <input type="number" class="weight-input" placeholder="kg">
+            </li>
+            <li class="exercise-item">
+                <input type="checkbox" id="ex2" class="exercise-check">
+                <label for="ex2" class="exercise-name">인클라인 덤벨프레스</label>
+                <input type="number" class="weight-input" placeholder="kg">
+            </li>
+            <li class="exercise-item">
+                <input type="checkbox" id="ex3" class="exercise-check">
+                <label for="ex3" class="exercise-name">플로어프레스</label>
+                <input type="number" class="weight-input" placeholder="kg">
+            </li>
+            <li class="exercise-item">
+                <input type="checkbox" id="ex4" class="exercise-check">
+                <label for="ex4" class="exercise-name">푸시업</label>
+                <input type="number" class="weight-input" placeholder="회">
+            </li>
+        </ul>
+
+        <!-- 저장 버튼 -->
+        <button class="save-button" id="save-btn">기록 저장</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
