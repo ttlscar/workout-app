@@ -2,17 +2,31 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>운동 기록</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
     <!-- 앱 컨테이너 -->
     <div class="app">
-        <!-- 헤더: 제목 표시 -->
+        <!-- 헤더: 설정 버튼 포함 -->
         <header class="header">
-            <h1>💪 오늘의 운동: 가슴</h1>
+            <div id="header-title">
+                <div class="header-date">로딩 중...</div>
+                <div class="header-workout">💪</div>
+            </div>
+            <button class="settings-btn" id="settings-btn">⚙️</button>
         </header>
+
+        <!-- 주간 달력 -->
+        <div class="calendar-container">
+            <div class="calendar" id="calendar">
+                <!-- JS로 렌더링 -->
+            </div>
+        </div>
 
         <!-- 진행률 바 -->
         <div class="progress-container">
@@ -23,31 +37,50 @@
         </div>
 
         <!-- 운동 목록 -->
-        <ul class="exercise-list">
-            <li class="exercise-item">
-                <input type="checkbox" id="ex1" class="exercise-check">
-                <label for="ex1" class="exercise-name">벤치프레스</label>
-                <input type="number" class="weight-input" placeholder="kg">
-            </li>
-            <li class="exercise-item">
-                <input type="checkbox" id="ex2" class="exercise-check">
-                <label for="ex2" class="exercise-name">인클라인 덤벨프레스</label>
-                <input type="number" class="weight-input" placeholder="kg">
-            </li>
-            <li class="exercise-item">
-                <input type="checkbox" id="ex3" class="exercise-check">
-                <label for="ex3" class="exercise-name">플로어프레스</label>
-                <input type="number" class="weight-input" placeholder="kg">
-            </li>
-            <li class="exercise-item">
-                <input type="checkbox" id="ex4" class="exercise-check">
-                <label for="ex4" class="exercise-name">푸시업</label>
-                <input type="number" class="weight-input" placeholder="회">
-            </li>
+        <ul class="exercise-list" id="exercise-list">
+            <!-- JS로 렌더링 -->
         </ul>
 
         <!-- 저장 버튼 -->
         <button class="save-button" id="save-btn">기록 저장</button>
+    </div>
+
+    <!-- 설정 모달 -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>운동 설정</h2>
+                <button class="close-btn" id="close-settings">&times;</button>
+            </div>
+
+            <!-- 요일별 목록 -->
+            <div id="settings-list">
+                <div class="settings-days" id="settings-days">
+                    <!-- JS로 렌더링 -->
+                </div>
+            </div>
+
+            <!-- 요일별 운동 편집 -->
+            <div id="day-editor" style="display: none;">
+                <button class="back-btn" id="back-to-list">← 목록으로</button>
+                <h3 id="editor-title">요일 운동 편집</h3>
+
+                <div class="editor-section">
+                    <label>운동 부위</label>
+                    <input type="text" id="workout-name-input" placeholder="예: 가슴, 등, 하체">
+                </div>
+
+                <div class="editor-section">
+                    <label>운동 목록</label>
+                    <div id="editor-exercise-list">
+                        <!-- JS로 렌더링 -->
+                    </div>
+                    <button class="add-btn" id="add-exercise-btn">+ 운동 추가</button>
+                </div>
+
+                <button class="save-day-btn" id="save-day-btn">저장</button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>

@@ -5,22 +5,31 @@
     box-sizing: border-box;
 }
 
-/* ===== 다크 모드 색상 ===== */
+/* ===== 피트니스 앱 색상 ===== */
 :root {
-    --bg-color: #1a1a2e;        /* 배경색: 진한 남색 */
-    --card-color: #16213e;       /* 카드 배경: 약간 밝은 남색 */
-    --text-color: #eaeaea;       /* 글자색: 밝은 회색 */
-    --accent-color: #4ecca3;     /* 강조색: 민트 그린 */
-    --border-color: #333;        /* 테두리색 */
+    --bg-color: #0d0d0d;           /* 배경: 거의 검정 */
+    --bg-gradient: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%);
+    --card-color: #1c1c1e;          /* 카드: 다크 그레이 */
+    --card-hover: #2c2c2e;
+    --text-color: #ffffff;          /* 텍스트: 흰색 */
+    --text-muted: #8e8e93;          /* 보조 텍스트 */
+    --accent-color: #ff6b35;        /* 강조: 오렌지 (에너지) */
+    --accent-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    --success-color: #30d158;       /* 성공: 그린 */
+    --danger-color: #ff453a;        /* 위험: 레드 */
+    --border-color: #2c2c2e;
+    --input-bg: #2c2c2e;
 }
 
 /* ===== 전체 페이지 ===== */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background-color: var(--bg-color);
+    background: var(--bg-gradient);
+    background-attachment: fixed;
     color: var(--text-color);
     min-height: 100vh;
     padding: 20px;
+    padding-bottom: 100px;
 }
 
 /* ===== 앱 컨테이너 ===== */
@@ -31,41 +40,168 @@ body {
 
 /* ===== 헤더 ===== */
 .header {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+    padding: 10px 0;
 }
 
-.header h1 {
-    font-size: 1.5rem;
+#header-title {
+    flex: 1;
+}
+
+.header-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.header-workout {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.settings-btn {
+    width: 48px;
+    height: 48px;
+    border: none;
+    background-color: var(--card-color);
+    border-radius: 14px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.settings-btn:active {
+    transform: scale(0.95);
+    background-color: var(--card-hover);
+}
+
+/* ===== 주간 달력 ===== */
+.calendar-container {
+    margin-bottom: 20px;
+    background: var(--card-color);
+    border-radius: 16px;
+    padding: 12px;
+}
+
+.calendar {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.calendar-day {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px;
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.calendar-day .day-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
     font-weight: 600;
+    text-transform: uppercase;
+}
+
+.calendar-day .day-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.calendar-day.today {
+    border-color: var(--accent-color);
+}
+
+.calendar-day.selected {
+    background: var(--accent-gradient);
+    border-color: transparent;
+}
+
+.calendar-day.selected .day-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.calendar-day.selected .day-number {
+    color: white;
+}
+
+.calendar-day.completed .check-mark {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(48, 209, 88, 0.4);
+}
+
+.calendar-day:active {
+    transform: scale(0.95);
 }
 
 /* ===== 진행률 바 ===== */
 .progress-container {
     background-color: var(--card-color);
-    padding: 15px;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: 16px;
     margin-bottom: 20px;
 }
 
 .progress-text {
     font-size: 0.9rem;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress-text span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent-color);
 }
 
 .progress-bar {
-    height: 20px;
-    background-color: var(--border-color);
-    border-radius: 10px;
+    height: 12px;
+    background-color: var(--input-bg);
+    border-radius: 6px;
     overflow: hidden;
 }
 
 .progress-fill {
     height: 100%;
     width: 0%;
-    background-color: var(--accent-color);
-    border-radius: 10px;
-    transition: width 0.3s ease;
+    background: var(--accent-gradient);
+    border-radius: 6px;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
 }
 
 /* ===== 운동 목록 ===== */
@@ -77,103 +213,424 @@ body {
 .exercise-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     background-color: var(--card-color);
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    border-left: 4px solid var(--accent-color);
+    transition: transform 0.2s, background-color 0.2s;
 }
 
-/* ===== 체크박스 스타일 ===== */
+.exercise-item:active {
+    background-color: var(--card-hover);
+}
+
+.exercise-item.done {
+    opacity: 0.5;
+    border-left-color: var(--success-color);
+}
+
+/* ===== 체크박스 커스텀 ===== */
 .exercise-check {
-    width: 24px;
-    height: 24px;
-    accent-color: var(--accent-color);
+    width: 28px;
+    height: 28px;
+    accent-color: var(--success-color);
     cursor: pointer;
+    flex-shrink: 0;
+}
+
+.exercise-check:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
 }
 
 /* ===== 운동 이름 ===== */
 .exercise-name {
     flex: 1;
     font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
+    min-width: 100px;
 }
 
-/* 체크되면 취소선 */
 .exercise-check:checked + .exercise-name {
     text-decoration: line-through;
-    opacity: 0.6;
+    color: var(--text-muted);
 }
 
-/* ===== 무게 입력 ===== */
-.weight-input {
-    width: 70px;
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    background-color: var(--bg-color);
+/* ===== 입력 그룹 ===== */
+.input-group {
+    display: flex;
+    gap: 8px;
+}
+
+/* ===== 무게/세트 입력 ===== */
+.weight-input,
+.sets-input {
+    width: 65px;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--input-bg);
     color: var(--text-color);
     text-align: center;
     font-size: 1rem;
+    font-weight: 600;
+    transition: box-shadow 0.2s;
 }
 
-.weight-input:focus {
+.weight-input:focus,
+.sets-input:focus {
     outline: none;
-    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.weight-input:disabled,
+.sets-input:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.weight-input::placeholder,
+.sets-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* 스피너 숨김 */
+.weight-input::-webkit-inner-spin-button,
+.weight-input::-webkit-outer-spin-button,
+.sets-input::-webkit-inner-spin-button,
+.sets-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* ===== 휴식일 표시 ===== */
+.rest-day {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--card-color);
+    border-radius: 16px;
+    font-size: 1.3rem;
+    color: var(--text-muted);
 }
 
 /* ===== 저장 버튼 ===== */
 .save-button {
     width: 100%;
-    padding: 15px;
-    background-color: var(--accent-color);
-    color: #1a1a2e;
+    padding: 18px;
+    background: var(--accent-gradient);
+    color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 16px;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .save-button:hover {
-    opacity: 0.9;
+    box-shadow: 0 6px 30px rgba(255, 107, 53, 0.5);
 }
 
 .save-button:active {
     transform: scale(0.98);
 }
 
-/* ===== 모바일 최적화 ===== */
+/* ===== 모달 ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-end;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
 
-/* 터치하기 쉽게 요소 크기 조정 */
+.modal.open {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--card-color);
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.close-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border-radius: 50%;
+    font-size: 1.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.close-btn:active {
+    background-color: var(--card-hover);
+}
+
+/* ===== 설정 - 요일 목록 ===== */
+.settings-days {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-day-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background-color: var(--bg-color);
+    border-radius: 14px;
+    border-left: 4px solid var(--accent-color);
+}
+
+.settings-day-item .day-name {
+    flex: 1;
+    font-weight: 600;
+}
+
+.settings-day-item .exercise-count {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    background: var(--input-bg);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.edit-day-btn {
+    padding: 10px 18px;
+    background: var(--accent-gradient);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.edit-day-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===== 설정 - 요일 편집 ===== */
+.back-btn {
+    padding: 10px 16px;
+    background-color: transparent;
+    color: var(--accent-color);
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 16px;
+}
+
+#day-editor h3 {
+    margin-bottom: 24px;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.editor-section {
+    margin-bottom: 24px;
+}
+
+.editor-section label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#workout-name-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+#workout-name-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+#editor-exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.editor-exercise-item {
+    display: flex;
+    gap: 10px;
+}
+
+.exercise-name-input {
+    flex: 1;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.exercise-name-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.delete-exercise-btn {
+    padding: 14px 16px;
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.delete-exercise-btn:active {
+    transform: scale(0.95);
+}
+
+.add-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 2px dashed var(--accent-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-btn:active {
+    background-color: rgba(255, 107, 53, 0.1);
+}
+
+.save-day-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent-gradient);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+}
+
+.save-day-btn:active {
+    transform: scale(0.98);
+}
+
+/* ===== 모바일 최적화 ===== */
 @media (max-width: 480px) {
     body {
         padding: 15px;
+        padding-bottom: 100px;
     }
 
-    .header h1 {
-        font-size: 1.3rem;
+    .header-workout {
+        font-size: 1.5rem;
+    }
+
+    .calendar-container {
+        padding: 10px;
+    }
+
+    .calendar-day {
+        padding: 8px 2px;
+    }
+
+    .calendar-day .day-number {
+        font-size: 1rem;
     }
 
     .exercise-item {
-        padding: 12px;
+        padding: 14px;
     }
 
     .exercise-check {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
     }
 
-    .weight-input {
-        width: 65px;
-        padding: 10px 5px;
+    .weight-input,
+    .sets-input {
+        width: 58px;
+        padding: 10px 6px;
     }
 
     .save-button {
         padding: 18px;
-        font-size: 1.2rem;
-        /* 모바일에서 하단 고정 */
+        font-size: 1.1rem;
         position: fixed;
         bottom: 20px;
         left: 15px;
@@ -181,14 +638,14 @@ body {
         width: auto;
     }
 
-    /* 버튼 공간 확보 */
     .exercise-list {
         margin-bottom: 80px;
     }
 }
 
 /* iOS Safari 입력창 줌 방지 */
-input[type="number"] {
+input[type="number"],
+input[type="text"] {
     font-size: 16px;
 }
 
@@ -197,9 +654,34 @@ html {
     scroll-behavior: smooth;
 }
 
-/* 텍스트 선택 방지 (앱처럼 느껴지게) */
+/* 텍스트 선택 방지 */
 .exercise-name,
-.save-button {
+.save-button,
+.calendar-day {
     -webkit-user-select: none;
     user-select: none;
+}
+
+/* 터치 하이라이트 제거 */
+button,
+input[type="checkbox"] {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
 }
