@@ -1,12 +1,12 @@
-const CACHE_NAME = 'workout-app-v1';
+const CACHE_NAME = 'workout-app-v2';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/app.js',
-    '/manifest.json',
-    '/icon-192.png',
-    '/icon-512.png'
+    './',
+    './index.html',
+    './style.css',
+    './app.js',
+    './manifest.json',
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 // 설치 시 캐시
