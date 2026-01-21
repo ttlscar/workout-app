@@ -68,6 +68,30 @@ body {
     background-clip: text;
 }
 
+.header-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.header-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background-color: var(--card-color);
+    border-radius: 12px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.header-btn:active {
+    transform: scale(0.95);
+    background-color: var(--card-hover);
+}
+
 .settings-btn {
     width: 48px;
     height: 48px;
@@ -93,6 +117,40 @@ body {
     background: var(--card-color);
     border-radius: 16px;
     padding: 12px;
+}
+
+.week-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 4px;
+}
+
+.week-nav-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.week-nav-btn:active {
+    transform: scale(0.95);
+    background: var(--accent-gradient);
+}
+
+.week-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
 }
 
 .calendar {
@@ -666,6 +724,341 @@ html {
 button,
 input[type="checkbox"] {
     -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== 기록 조회 모달 ===== */
+.history-date-picker {
+    margin-bottom: 20px;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.date-inputs input[type="date"] {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.date-inputs input[type="date"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.date-inputs span {
+    color: var(--text-muted);
+}
+
+.quick-select {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.quick-btn {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background-color: transparent;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-btn:active,
+.quick-btn.active {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: white;
+}
+
+.history-summary {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    flex: 1;
+    background-color: var(--bg-color);
+    padding: 16px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.summary-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 4px;
+}
+
+.summary-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.no-records {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.history-card {
+    background-color: var(--bg-color);
+    border-radius: 14px;
+    padding: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-left: 4px solid var(--border-color);
+}
+
+.history-card:active {
+    background-color: var(--card-hover);
+}
+
+.history-card.complete {
+    border-left-color: var(--success-color);
+}
+
+.history-card.rest {
+    opacity: 0.6;
+}
+
+.history-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-date {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.history-type {
+    flex: 1;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.history-progress {
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.history-progress-bar {
+    height: 6px;
+    background-color: var(--input-bg);
+    border-radius: 3px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.history-progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.history-details {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-color);
+}
+
+.history-card.expanded .history-details {
+    display: block;
+}
+
+.history-exercise {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.9rem;
+}
+
+.history-exercise.done {
+    color: var(--text-muted);
+}
+
+.history-exercise .ex-name {
+    font-weight: 500;
+}
+
+.history-exercise .ex-detail {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* ===== 통계 모달 ===== */
+.stats-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.stats-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background-color: var(--input-bg);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.stats-tab.active {
+    background: var(--accent-gradient);
+    color: white;
+}
+
+.stats-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat-card {
+    background-color: var(--bg-color);
+    padding: 20px 16px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.stat-card.primary {
+    background: var(--accent-gradient);
+}
+
+.stat-card.wide {
+    grid-column: span 2;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.stat-card.primary .stat-value {
+    color: white;
+}
+
+.stat-card:not(.primary) .stat-value {
+    color: var(--accent-color);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.stat-card.primary .stat-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* 비교 뷰 */
+.compare-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.compare-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background-color: transparent;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.compare-btn.active {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: white;
+}
+
+.compare-table {
+    background-color: var(--bg-color);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.compare-row {
+    display: grid;
+    grid-template-columns: 1.2fr repeat(3, 1fr);
+    padding: 14px 16px;
+    gap: 8px;
+    align-items: center;
+}
+
+.compare-row.header {
+    background-color: var(--card-hover);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.compare-row:not(.header) {
+    border-top: 1px solid var(--border-color);
+}
+
+.compare-row span:first-child {
+    font-weight: 500;
+}
+
+.compare-row span:not(:first-child) {
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.diff {
+    font-weight: 600;
+}
+
+.diff.positive {
+    color: var(--success-color);
+}
+
+.diff.negative {
+    color: var(--danger-color);
 }
 
 /* 스크롤바 스타일 */

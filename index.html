@@ -2,27 +2,45 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>운동 기록</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>">
+
+    <!-- PWA 설정 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff6b35">
+
+    <!-- iOS 설정 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="운동 기록">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- 스타일 -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- 앱 컨테이너 -->
     <div class="app">
-        <!-- 헤더: 설정 버튼 포함 -->
+        <!-- 헤더: 버튼 그룹 포함 -->
         <header class="header">
             <div id="header-title">
                 <div class="header-date">로딩 중...</div>
                 <div class="header-workout">💪</div>
             </div>
-            <button class="settings-btn" id="settings-btn">⚙️</button>
+            <div class="header-buttons">
+                <button class="header-btn" id="history-btn">📅</button>
+                <button class="header-btn" id="stats-btn">📊</button>
+                <button class="header-btn" id="settings-btn">⚙️</button>
+            </div>
         </header>
 
         <!-- 주간 달력 -->
         <div class="calendar-container">
+            <div class="week-nav">
+                <button class="week-nav-btn" id="prev-week-btn">◀</button>
+                <span class="week-label" id="week-label">이번 주</span>
+                <button class="week-nav-btn" id="next-week-btn">▶</button>
+            </div>
             <div class="calendar" id="calendar">
                 <!-- JS로 렌더링 -->
             </div>
@@ -83,6 +101,73 @@
         </div>
     </div>
 
+    <!-- 기록 조회 모달 -->
+    <div class="modal" id="history-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>운동 기록</h2>
+                <button class="close-btn" id="close-history">&times;</button>
+            </div>
+
+            <!-- 날짜 범위 선택 -->
+            <div class="history-date-picker">
+                <div class="date-inputs">
+                    <input type="date" id="history-start-date">
+                    <span>~</span>
+                    <input type="date" id="history-end-date">
+                </div>
+                <div class="quick-select">
+                    <button class="quick-btn" data-days="7">최근 7일</button>
+                    <button class="quick-btn" data-days="14">최근 14일</button>
+                    <button class="quick-btn" data-days="30">최근 30일</button>
+                    <button class="quick-btn" data-days="month">이번 달</button>
+                </div>
+            </div>
+
+            <!-- 요약 통계 -->
+            <div class="history-summary" id="history-summary">
+                <!-- JS로 렌더링 -->
+            </div>
+
+            <!-- 기록 목록 -->
+            <div class="history-list" id="history-list">
+                <!-- JS로 렌더링 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 통계 모달 -->
+    <div class="modal" id="stats-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>운동 통계</h2>
+                <button class="close-btn" id="close-stats">&times;</button>
+            </div>
+
+            <!-- 탭 -->
+            <div class="stats-tabs">
+                <button class="stats-tab active" data-tab="week">이번 주</button>
+                <button class="stats-tab" data-tab="month">이번 달</button>
+                <button class="stats-tab" data-tab="compare">비교</button>
+            </div>
+
+            <!-- 통계 내용 -->
+            <div class="stats-content" id="stats-content">
+                <!-- JS로 렌더링 -->
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
+    <script>
+        // Service Worker 등록
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW 등록 완료'))
+                    .catch(err => console.log('SW 등록 실패:', err));
+            });
+        }
+    </script>
 </body>
 </html>

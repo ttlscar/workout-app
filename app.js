@@ -161,15 +161,23 @@ function renderExerciseList() {
     const data = getAppData();
     const plan = getDayPlan(data, APP_STATE.selectedDate);
     const record = getRecord(data, APP_STATE.selectedDate);
-    const isEditable = isToday(APP_STATE.selectedDate);
+    const isEditable = true; // 모든 날짜 편집 가능
 
     if (plan.exercises.length === 0) {
         listEl.innerHTML = '<div class="rest-day">휴식일입니다 😴</div>';
         return;
     }
 
-    // 기록이 있으면 사용, 없으면 빈 기록 생성
-    const exercises = record ? record.exercises : createEmptyRecord(plan.exercises).exercises;
+    // 새 계획 기반으로 운동 목록 재구성 (기존 기록 데이터 유지)
+    let exercises;
+    if (record) {
+        exercises = plan.exercises.map(exerciseName => {
+            const existingRecord = record.exercises.find(ex => ex.name === exerciseName);
+            return existingRecord || { name: exerciseName, weight: '', sets: '', done: false };
+        });
+    } else {
+        exercises = createEmptyRecord(plan.exercises).exercises;
+    }
 
     listEl.innerHTML = exercises.map((ex, index) => `
         <li class="exercise-item ${ex.done ? 'done' : ''}">
@@ -245,13 +253,52 @@ function renderApp() {
     renderExerciseList();
     renderProgress();
     updateSaveButton();
+    updateWeekLabel();
+}
+
+// ===== 주간 네비게이션 =====
+function goToPrevWeek() {
+    const newDate = new Date(APP_STATE.selectedDate);
+    newDate.setDate(newDate.getDate() - 7);
+    APP_STATE.selectedDate = newDate;
+    renderApp();
+}
+
+function goToNextWeek() {
+    const newDate = new Date(APP_STATE.selectedDate);
+    newDate.setDate(newDate.getDate() + 7);
+    APP_STATE.selectedDate = newDate;
+    renderApp();
+}
+
+function updateWeekLabel() {
+    const weekLabel = document.getElementById('week-label');
+    const today = new Date();
+    const selectedWeekStart = getWeekDates(APP_STATE.selectedDate)[0];
+    const thisWeekStart = getWeekDates(today)[0];
+
+    const diffWeeks = Math.round((selectedWeekStart - thisWeekStart) / (7 * 24 * 60 * 60 * 1000));
+
+    if (diffWeeks === 0) {
+        weekLabel.textContent = '이번 주';
+    } else if (diffWeeks === -1) {
+        weekLabel.textContent = '지난 주';
+    } else if (diffWeeks === 1) {
+        weekLabel.textContent = '다음 주';
+    } else if (diffWeeks < 0) {
+        weekLabel.textContent = `${Math.abs(diffWeeks)}주 전`;
+    } else {
+        weekLabel.textContent = `${diffWeeks}주 후`;
+    }
 }
 
 function updateSaveButton() {
     const saveBtn = document.getElementById('save-btn');
-    const isEditable = isToday(APP_STATE.selectedDate);
+    const data = getAppData();
+    const plan = getDayPlan(data, APP_STATE.selectedDate);
 
-    if (isEditable) {
+    // 휴식일이 아니면 저장 버튼 표시
+    if (plan.exercises.length > 0) {
         saveBtn.style.display = 'block';
         saveBtn.textContent = '기록 저장';
     } else {
@@ -447,14 +494,497 @@ function closeDayEditor() {
     renderSettingsList();
 }
 
+// ===== 기록 조회 기능 =====
+function openHistory() {
+    document.getElementById('history-modal').classList.add('open');
+    // 기본값: 최근 7일
+    setQuickRange(7);
+}
+
+function closeHistory() {
+    document.getElementById('history-modal').classList.remove('open');
+}
+
+function setQuickRange(days) {
+    const endDate = new Date();
+    let startDate = new Date();
+
+    if (days === 'month') {
+        startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+    } else {
+        startDate.setDate(endDate.getDate() - days + 1);
+    }
+
+    document.getElementById('history-start-date').value = formatDate(startDate);
+    document.getElementById('history-end-date').value = formatDate(endDate);
+
+    // 버튼 활성화 상태
+    document.querySelectorAll('.quick-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.days === String(days)) {
+            btn.classList.add('active');
+        }
+    });
+
+    searchHistory();
+}
+
+function searchHistory() {
+    const startDate = new Date(document.getElementById('history-start-date').value);
+    const endDate = new Date(document.getElementById('history-end-date').value);
+
+    const records = getRecordsInRange(startDate, endDate);
+    renderHistorySummary(records);
+    renderHistoryList(records);
+}
+
+function getRecordsInRange(startDate, endDate) {
+    const data = getAppData();
+    const records = [];
+
+    const current = new Date(startDate);
+    while (current <= endDate) {
+        const dateKey = formatDate(current);
+        const record = data.records[dateKey];
+        const plan = getDayPlan(data, current);
+
+        if (record || plan.exercises.length > 0) {
+            records.push({
+                date: new Date(current),
+                dateKey: dateKey,
+                record: record,
+                plan: plan
+            });
+        }
+        current.setDate(current.getDate() + 1);
+    }
+
+    return records.reverse(); // 최신순
+}
+
+function renderHistorySummary(records) {
+    const summaryEl = document.getElementById('history-summary');
+
+    const workoutDays = records.filter(r => r.record && r.record.exercises.some(ex => ex.done)).length;
+    const totalDays = records.filter(r => r.plan.exercises.length > 0).length;
+
+    let totalCompletion = 0;
+    let completedCount = 0;
+
+    records.forEach(r => {
+        if (r.record && r.plan.exercises.length > 0) {
+            const done = r.record.exercises.filter(ex => ex.done).length;
+            totalCompletion += (done / r.plan.exercises.length) * 100;
+            completedCount++;
+        }
+    });
+
+    const avgCompletion = completedCount > 0 ? Math.round(totalCompletion / completedCount) : 0;
+
+    summaryEl.innerHTML = `
+        <div class="summary-item">
+            <span class="summary-value">${workoutDays}/${totalDays}</span>
+            <span class="summary-label">운동한 날</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-value">${avgCompletion}%</span>
+            <span class="summary-label">평균 완료율</span>
+        </div>
+    `;
+}
+
+function renderHistoryList(records) {
+    const listEl = document.getElementById('history-list');
+
+    if (records.length === 0) {
+        listEl.innerHTML = '<div class="no-records">기록이 없습니다</div>';
+        return;
+    }
+
+    listEl.innerHTML = records.map(r => renderHistoryItem(r)).join('');
+
+    // 펼치기/접기 이벤트
+    listEl.querySelectorAll('.history-card').forEach(card => {
+        card.addEventListener('click', () => {
+            card.classList.toggle('expanded');
+        });
+    });
+}
+
+function renderHistoryItem(item) {
+    const { date, record, plan } = item;
+
+    if (plan.exercises.length === 0) {
+        return `
+            <div class="history-card rest">
+                <div class="history-header">
+                    <span class="history-date">${date.getMonth() + 1}/${date.getDate()} (${DAY_LABELS[date.getDay()]})</span>
+                    <span class="history-type">휴식일</span>
+                </div>
+            </div>
+        `;
+    }
+
+    const exercises = record ? record.exercises : [];
+    const done = exercises.filter(ex => ex.done).length;
+    const total = plan.exercises.length;
+    const percent = Math.round((done / total) * 100);
+
+    const exerciseDetails = plan.exercises.map(exName => {
+        const exRecord = record ? record.exercises.find(e => e.name === exName) : null;
+        const isDone = exRecord ? exRecord.done : false;
+        const weight = exRecord && exRecord.weight ? `${exRecord.weight}kg` : '-';
+        const sets = exRecord && exRecord.sets ? `${exRecord.sets}세트` : '-';
+
+        return `
+            <div class="history-exercise ${isDone ? 'done' : ''}">
+                <span class="ex-name">${isDone ? '✓' : '○'} ${exName}</span>
+                <span class="ex-detail">${weight} / ${sets}</span>
+            </div>
+        `;
+    }).join('');
+
+    return `
+        <div class="history-card ${percent === 100 ? 'complete' : ''}">
+            <div class="history-header">
+                <span class="history-date">${date.getMonth() + 1}/${date.getDate()} (${DAY_LABELS[date.getDay()]})</span>
+                <span class="history-type">${plan.name}</span>
+                <span class="history-progress">${percent}%</span>
+            </div>
+            <div class="history-progress-bar">
+                <div class="history-progress-fill" style="width: ${percent}%"></div>
+            </div>
+            <div class="history-details">
+                ${exerciseDetails}
+            </div>
+        </div>
+    `;
+}
+
+// ===== 통계 기능 =====
+let currentStatsTab = 'week';
+
+function openStats() {
+    document.getElementById('stats-modal').classList.add('open');
+    currentStatsTab = 'week';
+    updateStatsTabs();
+    renderStats('week');
+}
+
+function closeStats() {
+    document.getElementById('stats-modal').classList.remove('open');
+}
+
+function updateStatsTabs() {
+    document.querySelectorAll('.stats-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.tab === currentStatsTab) {
+            tab.classList.add('active');
+        }
+    });
+}
+
+function switchStatsTab(tab) {
+    currentStatsTab = tab;
+    updateStatsTabs();
+
+    if (tab === 'compare') {
+        renderCompareView();
+    } else {
+        renderStats(tab);
+    }
+}
+
+function getWeekStats(startDate) {
+    const data = getAppData();
+    const stats = {
+        completionRate: 0,
+        workoutDays: 0,
+        plannedDays: 0,
+        completedExercises: 0,
+        totalSets: 0,
+        totalWeight: 0
+    };
+
+    const weekDates = [];
+    const current = new Date(startDate);
+    for (let i = 0; i < 7; i++) {
+        weekDates.push(new Date(current));
+        current.setDate(current.getDate() + 1);
+    }
+
+    let totalPercent = 0;
+
+    weekDates.forEach(date => {
+        const plan = getDayPlan(data, date);
+        const record = getRecord(data, date);
+
+        if (plan.exercises.length > 0) {
+            stats.plannedDays++;
+
+            if (record) {
+                const doneExercises = record.exercises.filter(ex => ex.done);
+                const percent = (doneExercises.length / plan.exercises.length) * 100;
+                totalPercent += percent;
+
+                if (doneExercises.length > 0) {
+                    stats.workoutDays++;
+                }
+
+                stats.completedExercises += doneExercises.length;
+
+                record.exercises.forEach(ex => {
+                    if (ex.done) {
+                        stats.totalSets += parseInt(ex.sets) || 0;
+                        stats.totalWeight += parseFloat(ex.weight) || 0;
+                    }
+                });
+            }
+        }
+    });
+
+    stats.completionRate = stats.plannedDays > 0 ? Math.round(totalPercent / stats.plannedDays) : 0;
+
+    return stats;
+}
+
+function getMonthStats(year, month) {
+    const data = getAppData();
+    const stats = {
+        completionRate: 0,
+        workoutDays: 0,
+        plannedDays: 0,
+        completedExercises: 0,
+        totalSets: 0,
+        totalWeight: 0
+    };
+
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+
+    let totalPercent = 0;
+
+    const current = new Date(startDate);
+    while (current <= endDate) {
+        const plan = getDayPlan(data, current);
+        const record = getRecord(data, current);
+
+        if (plan.exercises.length > 0) {
+            stats.plannedDays++;
+
+            if (record) {
+                const doneExercises = record.exercises.filter(ex => ex.done);
+                const percent = (doneExercises.length / plan.exercises.length) * 100;
+                totalPercent += percent;
+
+                if (doneExercises.length > 0) {
+                    stats.workoutDays++;
+                }
+
+                stats.completedExercises += doneExercises.length;
+
+                record.exercises.forEach(ex => {
+                    if (ex.done) {
+                        stats.totalSets += parseInt(ex.sets) || 0;
+                        stats.totalWeight += parseFloat(ex.weight) || 0;
+                    }
+                });
+            }
+        }
+        current.setDate(current.getDate() + 1);
+    }
+
+    stats.completionRate = stats.plannedDays > 0 ? Math.round(totalPercent / stats.plannedDays) : 0;
+
+    return stats;
+}
+
+function renderStats(period) {
+    const contentEl = document.getElementById('stats-content');
+    let stats, title;
+
+    if (period === 'week') {
+        const weekStart = getWeekDates(new Date())[0];
+        stats = getWeekStats(weekStart);
+        title = '이번 주 통계';
+    } else {
+        const now = new Date();
+        stats = getMonthStats(now.getFullYear(), now.getMonth());
+        title = `${now.getMonth() + 1}월 통계`;
+    }
+
+    contentEl.innerHTML = `
+        <h3 class="stats-title">${title}</h3>
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <span class="stat-value">${stats.completionRate}%</span>
+                <span class="stat-label">완료율</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${stats.workoutDays}/${stats.plannedDays}</span>
+                <span class="stat-label">운동일</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${stats.completedExercises}</span>
+                <span class="stat-label">완료 운동</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">${stats.totalSets}</span>
+                <span class="stat-label">총 세트</span>
+            </div>
+            <div class="stat-card wide">
+                <span class="stat-value">${stats.totalWeight.toLocaleString()} kg</span>
+                <span class="stat-label">총 무게</span>
+            </div>
+        </div>
+    `;
+}
+
+function renderCompareView() {
+    const contentEl = document.getElementById('stats-content');
+
+    contentEl.innerHTML = `
+        <div class="compare-selector">
+            <button class="compare-btn active" data-type="week">주간 비교</button>
+            <button class="compare-btn" data-type="month">월간 비교</button>
+        </div>
+        <div id="compare-content">
+            <!-- JS로 렌더링 -->
+        </div>
+    `;
+
+    // 버튼 이벤트
+    contentEl.querySelectorAll('.compare-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            contentEl.querySelectorAll('.compare-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCompareCards(btn.dataset.type);
+        });
+    });
+
+    renderCompareCards('week');
+}
+
+function renderCompareCards(type) {
+    const compareEl = document.getElementById('compare-content');
+    let current, previous, currentLabel, previousLabel;
+
+    if (type === 'week') {
+        const thisWeekStart = getWeekDates(new Date())[0];
+        const lastWeekStart = new Date(thisWeekStart);
+        lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+        current = getWeekStats(thisWeekStart);
+        previous = getWeekStats(lastWeekStart);
+        currentLabel = '이번 주';
+        previousLabel = '지난 주';
+    } else {
+        const now = new Date();
+        current = getMonthStats(now.getFullYear(), now.getMonth());
+
+        const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+        const lastYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+        previous = getMonthStats(lastYear, lastMonth);
+
+        currentLabel = `${now.getMonth() + 1}월`;
+        previousLabel = `${lastMonth + 1}월`;
+    }
+
+    const renderDiff = (curr, prev) => {
+        const diff = curr - prev;
+        if (diff > 0) return `<span class="diff positive">+${diff}</span>`;
+        if (diff < 0) return `<span class="diff negative">${diff}</span>`;
+        return `<span class="diff">-</span>`;
+    };
+
+    const renderPercentDiff = (curr, prev) => {
+        const diff = curr - prev;
+        if (diff > 0) return `<span class="diff positive">+${diff}%</span>`;
+        if (diff < 0) return `<span class="diff negative">${diff}%</span>`;
+        return `<span class="diff">-</span>`;
+    };
+
+    compareEl.innerHTML = `
+        <div class="compare-table">
+            <div class="compare-row header">
+                <span></span>
+                <span>${previousLabel}</span>
+                <span>${currentLabel}</span>
+                <span>변화</span>
+            </div>
+            <div class="compare-row">
+                <span>완료율</span>
+                <span>${previous.completionRate}%</span>
+                <span>${current.completionRate}%</span>
+                ${renderPercentDiff(current.completionRate, previous.completionRate)}
+            </div>
+            <div class="compare-row">
+                <span>운동일</span>
+                <span>${previous.workoutDays}</span>
+                <span>${current.workoutDays}</span>
+                ${renderDiff(current.workoutDays, previous.workoutDays)}
+            </div>
+            <div class="compare-row">
+                <span>완료 운동</span>
+                <span>${previous.completedExercises}</span>
+                <span>${current.completedExercises}</span>
+                ${renderDiff(current.completedExercises, previous.completedExercises)}
+            </div>
+            <div class="compare-row">
+                <span>총 세트</span>
+                <span>${previous.totalSets}</span>
+                <span>${current.totalSets}</span>
+                ${renderDiff(current.totalSets, previous.totalSets)}
+            </div>
+            <div class="compare-row">
+                <span>총 무게</span>
+                <span>${previous.totalWeight}kg</span>
+                <span>${current.totalWeight}kg</span>
+                ${renderDiff(current.totalWeight, previous.totalWeight)}
+            </div>
+        </div>
+    `;
+}
+
 // ===== 초기화 =====
 function initApp() {
     // 저장 버튼
     document.getElementById('save-btn').addEventListener('click', handleSave);
 
+    // 주간 네비게이션 버튼
+    document.getElementById('prev-week-btn').addEventListener('click', goToPrevWeek);
+    document.getElementById('next-week-btn').addEventListener('click', goToNextWeek);
+
     // 설정 버튼
     document.getElementById('settings-btn').addEventListener('click', openSettings);
     document.getElementById('close-settings').addEventListener('click', closeSettings);
+
+    // 기록 조회 버튼
+    document.getElementById('history-btn').addEventListener('click', openHistory);
+    document.getElementById('close-history').addEventListener('click', closeHistory);
+
+    // 날짜 변경 이벤트
+    document.getElementById('history-start-date').addEventListener('change', searchHistory);
+    document.getElementById('history-end-date').addEventListener('change', searchHistory);
+
+    // 빠른 선택 버튼
+    document.querySelectorAll('.quick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const days = btn.dataset.days === 'month' ? 'month' : parseInt(btn.dataset.days);
+            setQuickRange(days);
+        });
+    });
+
+    // 통계 버튼
+    document.getElementById('stats-btn').addEventListener('click', openStats);
+    document.getElementById('close-stats').addEventListener('click', closeStats);
+
+    // 통계 탭 이벤트
+    document.querySelectorAll('.stats-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            switchStatsTab(tab.dataset.tab);
+        });
+    });
 
     // 요일 편집 버튼들
     document.getElementById('add-exercise-btn').addEventListener('click', addExercise);
@@ -465,6 +995,18 @@ function initApp() {
     document.getElementById('settings-modal').addEventListener('click', (e) => {
         if (e.target.id === 'settings-modal') {
             closeSettings();
+        }
+    });
+
+    document.getElementById('history-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'history-modal') {
+            closeHistory();
+        }
+    });
+
+    document.getElementById('stats-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'stats-modal') {
+            closeStats();
         }
     });
 
